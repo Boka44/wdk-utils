@@ -13,7 +13,7 @@
 // limitations under the License.
 'use strict'
 
-import { sha256 } from '@noble/hashes/sha2'
+import { sha256 } from '@noble/hashes/sha2.js'
 import { base58 } from '@scure/base'
 
 const TRON_ADDRESS_PREFIX_BYTE = 0x41
