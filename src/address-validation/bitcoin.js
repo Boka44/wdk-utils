@@ -14,7 +14,7 @@
 'use strict'
 
 import { createBase58check, bech32, bech32m } from '@scure/base'
-import { sha256 } from '@noble/hashes/sha2'
+import { sha256 } from '@noble/hashes/sha2.js'
 
 /**
  * Bitcoin address validation.
