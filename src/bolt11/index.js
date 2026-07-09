@@ -15,7 +15,7 @@
 
 import { bech32, bech32m, createBase58check } from '@scure/base'
 import { stripLightningPrefix } from '../address-validation/utils.js'
-import { sha256 } from '@noble/hashes/sha2'
+import { sha256 } from '@noble/hashes/sha2.js'
 import { secp256k1 } from '@noble/curves/secp256k1.js'
 import { validateBitcoinAddress } from '../address-validation/bitcoin.js'
 

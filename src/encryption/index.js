@@ -14,15 +14,8 @@
 'use strict'
 
 import { gcm } from '@noble/ciphers/aes.js'
-import { clean } from '@noble/ciphers/utils.js'
+import { clean, bytesToHex, bytesToUtf8, hexToBytes, randomBytes, utf8ToBytes } from '@noble/ciphers/utils.js'
 import { scrypt } from '@noble/hashes/scrypt.js'
-import {
-  bytesToHex,
-  bytesToUtf8,
-  hexToBytes,
-  randomBytes,
-  utf8ToBytes
-} from '@noble/hashes/utils.js'
 
 /**
  * @typedef {Object} ScryptParams
