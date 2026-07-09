@@ -17,6 +17,7 @@ import { hkdf } from '@noble/hashes/hkdf.js'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { utf8ToBytes } from '@noble/hashes/utils.js'
 import { ed25519 } from '@noble/curves/ed25519.js'
+import { clean } from '@noble/ciphers/utils.js'
 
 const KEYPAIR_SEED_LEN = 32
 
@@ -56,11 +57,15 @@ export function deriveSeedKey (seed, options) {
  */
 export function deriveSeedKeyPair (seed, options) {
   const key = deriveSeedKey(seed, { ...options, length: KEYPAIR_SEED_LEN })
-  const publicKey = ed25519.getPublicKey(key)
-  const secretKey = new Uint8Array(KEYPAIR_SEED_LEN + publicKey.length)
-  secretKey.set(key)
-  secretKey.set(publicKey, KEYPAIR_SEED_LEN)
-  return { publicKey, secretKey }
+  try {
+    const publicKey = ed25519.getPublicKey(key)
+    const secretKey = new Uint8Array(KEYPAIR_SEED_LEN + publicKey.length)
+    secretKey.set(key)
+    secretKey.set(publicKey, KEYPAIR_SEED_LEN)
+    return { publicKey, secretKey }
+  } finally {
+    clean(key) // wipe the intermediate seed copy; secretKey keeps its own bytes
+  }
 }
 
 function toBytes (input) {
