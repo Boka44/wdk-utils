@@ -10,20 +10,21 @@
  * @property {Uint8Array} secretKey - 64-byte secret key (seed || publicKey).
  */
 /**
- * Derives a key from a high-entropy seed using HKDF-SHA256.
- * @param {string|Uint8Array} seed - High-entropy input keying material (e.g. a BIP-39 seed).
- * @param {SeedKeyOptions} [options]
+ * Derives a key from high-entropy input keying material using HKDF-SHA256.
+ * @param {string|Uint8Array} seed - The BIP-39 seed bytes (NOT the mnemonic phrase);
+ *   strings are consumed as raw UTF-8 bytes.
+ * @param {SeedKeyOptions} options - `salt` and `info` are required.
  * @returns {Uint8Array}
  */
-export function deriveSeedKey(seed: string | Uint8Array, { salt, info, length }?: SeedKeyOptions): Uint8Array;
+export function deriveSeedKey(seed: string | Uint8Array, options: SeedKeyOptions): Uint8Array;
 /**
  * Derives a deterministic ed25519 keypair from a seed.
  * Output is byte-compatible with hypercore-crypto's keyPair(seed).
- * @param {string|Uint8Array} seed
- * @param {SeedKeyOptions} [options]
+ * @param {string|Uint8Array} seed - The BIP-39 seed bytes (NOT the mnemonic phrase).
+ * @param {SeedKeyOptions} options - `salt` and `info` are required.
  * @returns {KeyPair}
  */
-export function deriveSeedKeyPair(seed: string | Uint8Array, options?: SeedKeyOptions): KeyPair;
+export function deriveSeedKeyPair(seed: string | Uint8Array, options: SeedKeyOptions): KeyPair;
 export type SeedKeyOptions = {
     /**
      * - Domain-separation salt.
