@@ -15,6 +15,7 @@ For detailed documentation about the complete WDK ecosystem, visit [docs.wallet.
 - **EVM Address Validation**: Validates Ethereum-like addresses, including EIP-55 checksum validation.
 - **EIP-681 Payment Request Parsing**: Parses Ethereum payment request URIs for token transfers.
 - **Lightning Network Validation**: Validates Lightning invoices and Lightning addresses.
+- **Solana Address Validation**: Validates base58-encoded 32-byte Solana addresses, including off-curve PDAs.
 - **Spark Address Validation**: Supports Spark address formats.
 - **UMA Address Validation**: Validates Universal Money Addresses.
 - **Seed Encryption**: Encrypts and decrypts seed phrases with AES-256-GCM and scrypt key derivation.
@@ -43,6 +44,7 @@ import {
   parseEip681Request,
   validateLightningInvoice,
   validateLightningAddress,
+  validateSolanaAddress,
   validateSparkAddress,
   validateUmaAddress,
   encrypt,
@@ -80,6 +82,10 @@ console.log(lnInvoiceResult) // { success: true, type: 'invoice' }
 const lnAddressResult = validateLightningAddress('user@domain.com')
 console.log(lnAddressResult) // { success: true, type: 'address' }
 
+// Solana Address Validation
+const solResult = validateSolanaAddress('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
+console.log(solResult) // { success: true, type: 'solana' }
+
 // Spark Address Validation
 const sparkResult = validateSparkAddress('...')
 console.log(sparkResult) // { success: true, type: 'btc' | 'alphanumeric' }
@@ -107,6 +113,7 @@ const { publicKey, secretKey } = deriveSeedKeyPair(seed, { salt: 'wdk-addressboo
 | `validateEVMAddress(address)` | EVM address string | `{ success: true, type: 'evm' }` | `{ success: false, reason: string }` |
 | `validateLightningInvoice(invoice)` | BOLT-11 invoice string | `{ success: true, type: 'invoice' }` | `{ success: false, reason: string }` |
 | `validateLightningAddress(address)` | Lightning address string | `{ success: true, type: 'address' }` | `{ success: false, reason: string }` |
+| `validateSolanaAddress(address)` | Solana address string | `{ success: true, type: 'solana' }` | `{ success: false, reason: string }` |
 | `validateSparkAddress(address)` | Spark address string | `{ success: true, type: 'btc' \| 'alphanumeric' }` | `{ success: false, reason: string }` |
 | `validateUmaAddress(address)` | UMA string (`$user@domain`) | `{ success: true, type: 'uma' }` | `{ success: false, reason: string }` |
 
