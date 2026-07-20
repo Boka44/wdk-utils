@@ -58,14 +58,28 @@ describe('shamir', () => {
   })
 
   describe('share size is entropy-based', () => {
-    it('produces ~17-byte shares for a 12-word mnemonic (16-byte entropy + index)', async () => {
+    it('produces 21-byte shares for a 12-word mnemonic (16-byte entropy + 4-byte checksum + index)', async () => {
       const parts = await splitMnemonic(MNEMONICS[12], { shares: 3, threshold: 2 })
-      parts.forEach((part) => expect(part.length / 2).toBe(17))
+      parts.forEach((part) => expect(part.length / 2).toBe(21))
     })
 
-    it('produces ~33-byte shares for a 24-word mnemonic (32-byte entropy + index)', async () => {
+    it('produces 37-byte shares for a 24-word mnemonic (32-byte entropy + 4-byte checksum + index)', async () => {
       const parts = await splitMnemonic(MNEMONICS[24], { shares: 3, threshold: 2 })
-      parts.forEach((part) => expect(part.length / 2).toBe(33))
+      parts.forEach((part) => expect(part.length / 2).toBe(37))
+    })
+  })
+
+  describe('integrity checksum on combine', () => {
+    it('rejects a corrupted share instead of returning a wrong phrase', async () => {
+      const parts = await splitMnemonic(MNEMONICS[12], { shares: 3, threshold: 2 })
+      const corrupted = [...parts]
+      corrupted[0] = (corrupted[0][0] === '0' ? '1' : '0') + corrupted[0].slice(1)
+      await expect(combineMnemonic([corrupted[0], corrupted[1]])).rejects.toThrow('Invalid shares')
+    })
+
+    it('rejects a below-threshold share subset', async () => {
+      const parts = await splitMnemonic(MNEMONICS[12], { shares: 5, threshold: 3 })
+      await expect(combineMnemonic([parts[0], parts[1]])).rejects.toThrow('Invalid shares')
     })
   })
 

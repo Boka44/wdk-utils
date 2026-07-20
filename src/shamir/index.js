@@ -16,9 +16,43 @@
 import { split as shamirSplit, combine as shamirCombine } from 'shamir-secret-sharing'
 import { mnemonicToEntropy, entropyToMnemonic } from '@scure/bip39'
 import { wordlist } from '@scure/bip39/wordlists/english.js'
+import { sha256 } from '@noble/hashes/sha2.js'
 import { bytesToHex, hexToBytes, clean } from '@noble/hashes/utils.js'
 
 const MAX_SHARES = 255
+
+// Bytes of a SHA-256 digest prefixed to the entropy before splitting. Shamir
+// shares are otherwise unauthenticated, so this lets combine detect a wrong or
+// corrupted share set (error detection, not defense against forged shares).
+const CHECKSUM_LEN = 4
+
+/**
+ * Prefixes the entropy with a truncated SHA-256 checksum.
+ * @param {Uint8Array} entropy
+ * @returns {Uint8Array} `checksum || entropy`
+ */
+function attachChecksum (entropy) {
+  const secret = new Uint8Array(CHECKSUM_LEN + entropy.length)
+  secret.set(sha256(entropy).subarray(0, CHECKSUM_LEN))
+  secret.set(entropy, CHECKSUM_LEN)
+  return secret
+}
+
+/**
+ * Separates a reconstructed `checksum || entropy` secret and verifies the checksum.
+ * @param {Uint8Array} secret
+ * @returns {Uint8Array} The verified entropy (a view into `secret`).
+ * @throws If the secret is too short or the checksum does not match.
+ */
+function verifyChecksum (secret) {
+  if (secret.length <= CHECKSUM_LEN) throw new Error('reconstructed secret is too short')
+  const entropy = secret.subarray(CHECKSUM_LEN)
+  const expected = sha256(entropy).subarray(0, CHECKSUM_LEN)
+  for (let i = 0; i < CHECKSUM_LEN; i++) {
+    if (secret[i] !== expected[i]) throw new Error('checksum mismatch')
+  }
+  return entropy
+}
 
 /**
  * @typedef {Object} SplitOptions
@@ -73,7 +107,9 @@ function validateShares (shares) {
  *
  * The mnemonic is decoded to its raw BIP-39 entropy (16-32 bytes) before
  * splitting, so an invalid checksum or a non-wordlist word is rejected here.
- * Only the entropy is shared; the phrase is re-derived on {@link combineMnemonic}.
+ * A 4-byte integrity checksum is prefixed to the entropy so that a wrong or
+ * corrupted share set is rejected by {@link combineMnemonic}; the phrase itself
+ * is re-derived on combine, not stored in the shares.
  *
  * @param {string} mnemonic - A valid BIP-39 mnemonic (12, 15, 18, 21, or 24 words).
  * @param {SplitOptions} options - Split configuration.
@@ -91,22 +127,25 @@ export async function splitMnemonic (mnemonic, options) {
     throw new Error('Invalid mnemonic: expected a valid BIP-39 phrase')
   }
 
+  let secret
   try {
-    const shareArrays = await shamirSplit(entropy, shares, threshold)
+    secret = attachChecksum(entropy)
+    const shareArrays = await shamirSplit(secret, shares, threshold)
     return shareArrays.map((share) => bytesToHex(share))
   } finally {
     clean(entropy)
+    if (secret) clean(secret)
   }
 }
 
 /**
- * Reconstructs a BIP-39 mnemonic from Shamir shares.
+ * Reconstructs a BIP-39 mnemonic from Shamir shares. At least `threshold`
+ * shares must be supplied.
  *
- * The recovered entropy is re-encoded through BIP-39, so the returned phrase
- * carries a valid checksum. At least `threshold` shares must be supplied.
- *
- * Note: Shamir shares are unauthenticated. Supplying wrong or too few (but >= 2)
- * shares yields a different, still checksum-valid phrase rather than an error.
+ * The 4-byte checksum embedded at split time is verified here, so wrong,
+ * corrupted, or insufficient shares are rejected instead of returning an
+ * incorrect phrase. This is error detection, not authentication against
+ * maliciously crafted shares.
  *
  * @param {string[]} shares - Hex-encoded shares produced by {@link splitMnemonic}.
  * @returns {Promise<string>} The reconstructed BIP-39 mnemonic.
@@ -115,13 +154,13 @@ export async function combineMnemonic (shares) {
   const normalized = validateShares(shares)
   const shareArrays = normalized.map((share) => hexToBytes(share))
 
-  let entropy
+  let secret
   try {
-    entropy = await shamirCombine(shareArrays)
-    return entropyToMnemonic(entropy, wordlist)
+    secret = await shamirCombine(shareArrays)
+    return entropyToMnemonic(verifyChecksum(secret), wordlist)
   } catch {
     throw new Error('Invalid shares: could not reconstruct a valid mnemonic')
   } finally {
-    if (entropy) clean(entropy)
+    if (secret) clean(secret)
   }
 }

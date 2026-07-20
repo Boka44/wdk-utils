@@ -215,16 +215,16 @@ Derives a deterministic ed25519 keypair from a seed. Output is byte-compatible w
 - **Returns**: `{ publicKey: Uint8Array, secretKey: Uint8Array }` — `publicKey` is 32 bytes; `secretKey` is 64 bytes (`seed32 || publicKey`).
 
 ### `splitMnemonic(mnemonic: string, options: SplitOptions)`
-Splits a BIP-39 mnemonic into hex-encoded Shamir shares. The mnemonic is decoded to its raw BIP-39 entropy (16–32 bytes) before splitting, so only the entropy is shared and the phrase is re-derived on `combineMnemonic`.
+Splits a BIP-39 mnemonic into hex-encoded Shamir shares. The mnemonic is decoded to its raw BIP-39 entropy (16–32 bytes) and prefixed with a 4-byte integrity checksum before splitting, so only that is shared and the phrase is re-derived on `combineMnemonic`.
 - **mnemonic**: A valid BIP-39 mnemonic (12, 15, 18, 21, or 24 words). Leading/trailing/repeated whitespace is normalized; an invalid checksum, a non-wordlist word, or a bad word count is rejected here.
 - **options**: `{ shares, threshold }` — `shares` is the total number of shares to create (n, `2..255`); `threshold` is the minimum needed to reconstruct (k, `2..shares`).
-- **Returns**: `Promise<string[]>` — an array of `shares` hex-encoded strings (~17 bytes each for a 12-word mnemonic).
+- **Returns**: `Promise<string[]>` — an array of `shares` hex-encoded strings (~21 bytes each for a 12-word mnemonic: 16-byte entropy + 4-byte checksum + index).
 
 ### `combineMnemonic(shares: string[])`
 Reconstructs a BIP-39 mnemonic from Shamir shares. At least `threshold` shares must be supplied; share hex is case-insensitive.
 - **shares**: Array of hex-encoded shares produced by `splitMnemonic` (at least 2).
 - **Returns**: `Promise<string>` — the reconstructed BIP-39 mnemonic.
-- **Note**: Shamir shares are unauthenticated. Supplying wrong or too few (but ≥ 2) shares yields a *different, still checksum-valid* phrase rather than an error — verify the result out of band.
+- **Integrity**: The embedded checksum is verified, so wrong, corrupted, or insufficient shares are rejected instead of returning an incorrect phrase. This is error detection, not authentication against maliciously crafted shares.
 
 ## 🛠️ Development
 
