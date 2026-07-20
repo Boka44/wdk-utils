@@ -42,6 +42,23 @@ const IV_LEN = 12
 const GCM_TAG_LEN = 16
 const SCRYPT_MAX_MEM = 128 * 1024 * 1024
 
+/**
+ * `randomBytes()` (via @noble/ciphers) reads `crypto.getRandomValues` off
+ * `globalThis`. React Native's Hermes engine doesn't provide it, which
+ * surfaces there as an opaque "crypto.getRandomValues must be defined"
+ * throw with no indication of the fix. We check and return an actionable error.
+ */
+function assertSecureRandomAvailable () {
+  if (typeof globalThis.crypto?.getRandomValues !== 'function') {
+    throw new Error(
+      'crypto.getRandomValues is not available in this environment. ' +
+      'On React Native, install `react-native-get-random-values` and import it ' +
+      'as the first import in your app entry point, before anything that imports ' +
+      '@tetherto/wdk-utils. See the README "Platform Requirements" section.'
+    )
+  }
+}
+
 /** @type {Required<ScryptParams>} */
 export const DEFAULT_SCRYPT_PARAMS = {
   N: 2 ** 16,
@@ -98,6 +115,7 @@ export function deriveKey (password, salt, scryptParams) {
  * @returns {EncryptedPayload} The encrypted payload including salt, IV, tag, and ciphertext.
  */
 export function encrypt (plaintext, password, scryptParams) {
+  assertSecureRandomAvailable()
   const resolved = resolveScryptParams(scryptParams)
   const salt = randomBytes(SALT_LEN)
   const key = deriveKey(password, salt, resolved)
