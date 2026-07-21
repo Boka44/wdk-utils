@@ -1,6 +1,6 @@
 # @tetherto/wdk-utils
 
-A collection of utilities for validating cryptocurrency addresses, passphrase-protected seed encryption, HKDF-based key derivation, and payment URIs. This package provides a set of functions to validate various address formats and parse payment requests from different blockchain networks.
+A collection of utilities for validating cryptocurrency addresses, passphrase-protected seed encryption, HKDF-based key derivation, Shamir secret sharing for mnemonics, and payment URIs. This package provides a set of functions to validate various address formats and parse payment requests from different blockchain networks.
 
 ## 🔍 About WDK
 
@@ -19,6 +19,7 @@ For detailed documentation about the complete WDK ecosystem, visit [docs.wallet.
 - **UMA Address Validation**: Validates Universal Money Addresses.
 - **Seed Encryption**: Encrypts and decrypts seed phrases with AES-256-GCM and scrypt key derivation.
 - **Key Derivation**: HKDF-SHA256 seed derivation and deterministic ed25519 keypair generation.
+- **Shamir Secret Sharing**: Splits a BIP-39 mnemonic into `n` shares, any `k` of which reconstruct it.
 
 ## ⬇️ Installation
 
@@ -48,7 +49,9 @@ import {
   encrypt,
   decrypt,
   deriveSeedKey,
-  deriveSeedKeyPair
+  deriveSeedKeyPair,
+  splitMnemonic,
+  combineMnemonic
 } from '@tetherto/wdk-utils';
 ```
 
@@ -94,6 +97,11 @@ const decrypted = decrypt(payload, passphrase);
 // Key Derivation
 const derivedKey = deriveSeedKey(seed, { salt: 'wdk-addressbook-v1', info: 'autobase-encryption' });
 const { publicKey, secretKey } = deriveSeedKeyPair(seed, { salt: 'wdk-addressbook-v1', info: 'bootstrap-writer' });
+
+// Shamir Secret Sharing — split a mnemonic into 5 shares, any 3 reconstruct it
+const shares = await splitMnemonic(mnemonic, { shares: 5, threshold: 3 });
+const recovered = await combineMnemonic(shares.slice(0, 3));
+console.log(recovered === mnemonic); // true
 
 ```
 
@@ -205,6 +213,18 @@ Derives a key from high-entropy input using HKDF-SHA256.
 Derives a deterministic ed25519 keypair from a seed. Output is byte-compatible with hypercore-crypto's `keyPair(seed)`.
 - **options**: `{ salt, info }` — domain-separation labels (key length is fixed at 32 bytes).
 - **Returns**: `{ publicKey: Uint8Array, secretKey: Uint8Array }` — `publicKey` is 32 bytes; `secretKey` is 64 bytes (`seed32 || publicKey`).
+
+### `splitMnemonic(mnemonic: string, options: SplitOptions)`
+Splits a BIP-39 mnemonic into hex-encoded Shamir shares. The mnemonic is decoded to its raw BIP-39 entropy (16–32 bytes) and prefixed with a 4-byte integrity checksum before splitting, so only that is shared and the phrase is re-derived on `combineMnemonic`.
+- **mnemonic**: A valid BIP-39 mnemonic (12, 15, 18, 21, or 24 words). Leading/trailing/repeated whitespace is normalized; an invalid checksum, a non-wordlist word, or a bad word count is rejected here.
+- **options**: `{ shares, threshold }` — `shares` is the total number of shares to create (n, `2..255`); `threshold` is the minimum needed to reconstruct (k, `2..shares`).
+- **Returns**: `Promise<string[]>` — an array of `shares` hex-encoded strings (~21 bytes each for a 12-word mnemonic: 16-byte entropy + 4-byte checksum + index).
+
+### `combineMnemonic(shares: string[])`
+Reconstructs a BIP-39 mnemonic from Shamir shares. At least `threshold` shares must be supplied; share hex is case-insensitive.
+- **shares**: Array of hex-encoded shares produced by `splitMnemonic` (at least 2).
+- **Returns**: `Promise<string>` — the reconstructed BIP-39 mnemonic.
+- **Integrity**: The embedded checksum is verified, so wrong, corrupted, or insufficient shares are rejected instead of returning an incorrect phrase. This is error detection, not authentication against maliciously crafted shares.
 
 ## 🛠️ Development
 
