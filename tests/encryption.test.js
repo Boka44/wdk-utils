@@ -71,4 +71,26 @@ describe('encryption', () => {
     expect(payload.scryptN).toBe(32768)
     expect(decrypt(payload, 'testpassword123')).toBe(PHRASE)
   })
+
+  it('throws an actionable error when crypto.getRandomValues is unavailable', () => {
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'crypto')
+    Object.defineProperty(globalThis, 'crypto', { value: {}, configurable: true })
+    try {
+      expect(() => encrypt(PHRASE, 'testpassword123')).toThrow(/react-native-get-random-values/)
+    } finally {
+      Object.defineProperty(globalThis, 'crypto', descriptor)
+    }
+  })
+
+  it('does not require crypto.getRandomValues to decrypt', () => {
+    const payload = encrypt(PHRASE, 'testpassword123')
+
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'crypto')
+    Object.defineProperty(globalThis, 'crypto', { value: {}, configurable: true })
+    try {
+      expect(decrypt(payload, 'testpassword123')).toBe(PHRASE)
+    } finally {
+      Object.defineProperty(globalThis, 'crypto', descriptor)
+    }
+  })
 })
