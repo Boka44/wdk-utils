@@ -184,7 +184,7 @@ const FORMAT_ENCODERS = {
       if (!validation.success) throw new Error('INVALID_FALLBACK_ADDRESS')
 
       if (networkInfo) {
-        const isBtcMainnet = networkInfo.network === 'bitcoin' && validation.network === 'mainnet'
+        const isBtcMainnet = networkInfo.network === 'bitcoin' && validation.network === 'bitcoin'
         const isBtcTestnet = networkInfo.network === 'testnet' && (validation.network === 'testnet' || validation.network === 'signet')
         const isBtcRegtest = networkInfo.network === 'regtest' && validation.network === 'regtest'
 

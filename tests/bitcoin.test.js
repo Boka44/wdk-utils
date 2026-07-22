@@ -24,10 +24,10 @@ describe('bitcoin', () => {
   }
 
   const successCases = [
-    { address: mainnet.p2pkh, expected: { success: true, type: 'p2pkh', network: 'mainnet' } },
-    { address: mainnet.p2sh, expected: { success: true, type: 'p2sh', network: 'mainnet' } },
-    { address: mainnet.bech32, expected: { success: true, type: 'bech32', network: 'mainnet' } },
-    { address: mainnet.bech32m, expected: { success: true, type: 'bech32m', network: 'mainnet' } },
+    { address: mainnet.p2pkh, expected: { success: true, type: 'p2pkh', network: 'bitcoin' } },
+    { address: mainnet.p2sh, expected: { success: true, type: 'p2sh', network: 'bitcoin' } },
+    { address: mainnet.bech32, expected: { success: true, type: 'bech32', network: 'bitcoin' } },
+    { address: mainnet.bech32m, expected: { success: true, type: 'bech32m', network: 'bitcoin' } },
     { address: testnet.p2pkh, expected: { success: true, type: 'p2pkh', network: 'testnet' } },
     { address: testnet.p2sh, expected: { success: true, type: 'p2sh', network: 'testnet' } },
     { address: testnet.bech32, expected: { success: true, type: 'bech32', network: 'testnet' } },

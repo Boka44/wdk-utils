@@ -18,14 +18,14 @@ import { sha256 } from '@noble/hashes/sha2.js'
 
 /**
  * Bitcoin address validation.
- * Validates format and checksum for mainnet and testnet addresses.
+ * Validates format and checksum for bitcoin, testnet, and regtest addresses.
  * Supports P2PKH, P2SH, SegWit v0 (Bech32), and SegWit v1+ (Bech32m).
  */
 
 const base58check = createBase58check(sha256)
 
 const NETWORKS = {
-  mainnet: {
+  bitcoin: {
     bech32: 'bc',
     p2pkh: 0x00,
     p2sh: 0x05
@@ -44,7 +44,7 @@ const NETWORKS = {
 const WITNESS_VERSION_BECH32 = 0
 
 /**
- * @typedef {{ success: true, type: 'p2pkh' | 'p2sh' | 'bech32' | 'bech32m', network: 'mainnet' | 'testnet' | 'regtest' }} BtcAddressValidationSuccess
+ * @typedef {{ success: true, type: 'p2pkh' | 'p2sh' | 'bech32' | 'bech32m', network: 'bitcoin' | 'testnet' | 'regtest' }} BtcAddressValidationSuccess
  * @typedef {{ success: false, reason: string }} BtcAddressValidationFailure
  * @typedef {BtcAddressValidationSuccess | BtcAddressValidationFailure} BtcAddressValidationResult
  */
@@ -84,8 +84,8 @@ function _decodeBase58 (address) {
  */
 function _validateP2PKH (decoded) {
   const version = decoded[0]
-  if (version === NETWORKS.mainnet.p2pkh) {
-    return { success: true, type: 'p2pkh', network: 'mainnet' }
+  if (version === NETWORKS.bitcoin.p2pkh) {
+    return { success: true, type: 'p2pkh', network: 'bitcoin' }
   }
   if (version === NETWORKS.testnet.p2pkh) {
     return { success: true, type: 'p2pkh', network: 'testnet' }
@@ -102,8 +102,8 @@ function _validateP2PKH (decoded) {
 function _validateP2SH (decoded) {
   const version = decoded[0]
 
-  if (version === NETWORKS.mainnet.p2sh) {
-    return { success: true, type: 'p2sh', network: 'mainnet' }
+  if (version === NETWORKS.bitcoin.p2sh) {
+    return { success: true, type: 'p2sh', network: 'bitcoin' }
   }
 
   if (version === NETWORKS.testnet.p2sh) {
@@ -150,7 +150,7 @@ export function validateBech32 (address) {
     }
 
     const prefix = address.toLowerCase().substring(0, address.lastIndexOf('1'))
-    if (prefix === NETWORKS.mainnet.bech32) return { success: true, type: 'bech32', network: 'mainnet' }
+    if (prefix === NETWORKS.bitcoin.bech32) return { success: true, type: 'bech32', network: 'bitcoin' }
     if (prefix === NETWORKS.testnet.bech32) return { success: true, type: 'bech32', network: 'testnet' }
     // Note: Regtest addresses are Bech32m, not Bech32. This validator will correctly fail them.
 
@@ -184,7 +184,7 @@ export function validateBech32m (address) {
     }
 
     const prefix = address.toLowerCase().substring(0, address.lastIndexOf('1'))
-    if (prefix === NETWORKS.mainnet.bech32) return { success: true, type: 'bech32m', network: 'mainnet' }
+    if (prefix === NETWORKS.bitcoin.bech32) return { success: true, type: 'bech32m', network: 'bitcoin' }
     if (prefix === NETWORKS.testnet.bech32) return { success: true, type: 'bech32m', network: 'testnet' }
     if (prefix === NETWORKS.regtest.bech32) return { success: true, type: 'bech32m', network: 'regtest' }
 
@@ -198,7 +198,7 @@ export function validateBech32m (address) {
 }
 
 /**
- * Validates a Bitcoin address for mainnet or testnet.
+ * Validates a Bitcoin address for any supported network.
  *
  * @param {string} address The address to validate.
  * @returns {BtcAddressValidationResult}
