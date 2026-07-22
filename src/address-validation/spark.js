@@ -16,11 +16,9 @@
 import { bech32m } from '@scure/base'
 import { validateBech32m } from './bitcoin.js'
 
-/**
- * @typedef {{ success: true, type: 'spark' | 'btc' }} SparkAddressValidationSuccess
- * @typedef {{ success: false, reason: string }} SparkAddressValidationFailure
- * @typedef {SparkAddressValidationSuccess | SparkAddressValidationFailure} SparkAddressValidationResult
- */
+/** @typedef {import("./types.js").AddressValidationSuccess} SparkAddressValidationSuccess */
+/** @typedef {import("./types.js").AddressValidationFailure} SparkAddressValidationFailure */
+/** @typedef {import("./types.js").AddressValidationResult} SparkAddressValidationResult */
 
 const VALID_PREFIXES = ['spark', 'sparkrt', 'sparkt', 'sparks', 'sparkl']
 

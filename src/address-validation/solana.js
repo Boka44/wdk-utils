@@ -15,15 +15,13 @@
 
 import { base58 } from '@scure/base'
 
+/** @typedef {import("./types.js").AddressValidationSuccess} SolanaAddressValidationSuccess */
+/** @typedef {import("./types.js").AddressValidationFailure} SolanaAddressValidationFailure */
+/** @typedef {import("./types.js").AddressValidationResult} SolanaAddressValidationResult */
+
 const SOLANA_PUBLIC_KEY_LENGTH = 32
 const SOLANA_ADDRESS_MIN_LENGTH = 32
 const SOLANA_ADDRESS_MAX_LENGTH = 44
-
-/**
- * @typedef {{ success: true, type: 'solana' }} SolanaAddressValidationSuccess
- * @typedef {{ success: false, reason: string }} SolanaAddressValidationFailure
- * @typedef {SolanaAddressValidationSuccess | SolanaAddressValidationFailure} SolanaAddressValidationResult
- */
 
 /**
  * Validates a Solana address (base58-encoded 32-byte public key).

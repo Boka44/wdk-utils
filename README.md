@@ -55,6 +55,7 @@ Without it, `encrypt()` throws with a message pointing back to this section rath
 
 ```javascript
 import {
+  validateAddress,
   validateBitcoinAddress,
   isBip21Request,
   parseBip21Request,
@@ -79,9 +80,13 @@ import {
 ### Usage Examples
 
 ```javascript
+// Generic Address Validation (dispatches by CAIP-2 chain id)
+const result = validateAddress('eip155:1', '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe')
+console.log(result) // { success: true, type: 'evm' }
+
 // Bitcoin Address Validation
 const btcResult = validateBitcoinAddress('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh')
-console.log(btcResult) // { success: true, type: 'bech32', network: 'mainnet' }
+console.log(btcResult) // { success: true, type: 'bech32', network: 'bitcoin' }
 
 // BIP-21 Payment URI Parsing
 const bip21Result = parseBip21Request('bitcoin:bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh?amount=0.001&label=Donation')
@@ -110,7 +115,7 @@ console.log(solResult) // { success: true, type: 'solana' }
 
 // Spark Address Validation
 const sparkResult = validateSparkAddress('...')
-console.log(sparkResult) // { success: true, type: 'btc' | 'alphanumeric' }
+console.log(sparkResult) // { success: true, type: 'spark' | 'btc' }
 
 const umaResult = validateUmaAddress('$user@domain.com')
 console.log(umaResult) // { success: true, type: 'uma' }
@@ -136,12 +141,13 @@ console.log(recovered === mnemonic); // true
 
 | Function | Input | Returns on success | Returns on failure |
 |---|---|---|---|
-| `validateBitcoinAddress(address)` | Bitcoin address string | `{ success: true, type: 'p2pkh' \| 'p2sh' \| 'bech32' \| 'bech32m', network: 'mainnet' \| 'testnet' \| 'regtest' }` | `{ success: false, reason: string }` |
+| `validateAddress(chainId, address)` | CAIP-2 chain id (e.g. `'eip155:1'`) and address string | The chain validator's result (see rows below) | `{ success: false, reason: string }`, or `null` when the chain namespace has no validator |
+| `validateBitcoinAddress(address)` | Bitcoin address string | `{ success: true, type: 'p2pkh' \| 'p2sh' \| 'bech32' \| 'bech32m', network: 'bitcoin' \| 'testnet' \| 'regtest' }` | `{ success: false, reason: string }` |
 | `validateEVMAddress(address)` | EVM address string | `{ success: true, type: 'evm' }` | `{ success: false, reason: string }` |
 | `validateLightningInvoice(invoice)` | BOLT-11 invoice string | `{ success: true, type: 'invoice' }` | `{ success: false, reason: string }` |
 | `validateLightningAddress(address)` | Lightning address string | `{ success: true, type: 'address' }` | `{ success: false, reason: string }` |
 | `validateSolanaAddress(address)` | Solana address string | `{ success: true, type: 'solana' }` | `{ success: false, reason: string }` |
-| `validateSparkAddress(address)` | Spark address string | `{ success: true, type: 'btc' \| 'alphanumeric' }` | `{ success: false, reason: string }` |
+| `validateSparkAddress(address)` | Spark address string | `{ success: true, type: 'spark' \| 'btc' }` | `{ success: false, reason: string }` |
 | `validateUmaAddress(address)` | UMA string (`$user@domain`) | `{ success: true, type: 'uma' }` | `{ success: false, reason: string }` |
 
 ### Payment URI Parsing

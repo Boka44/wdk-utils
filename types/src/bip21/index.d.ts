@@ -2,7 +2,7 @@
  * Returns true if the input looks like a BIP-21 Bitcoin payment URI.
  * This is a syntactic check only — it does not validate the address or parameters.
  *
- * @param {string} input
+ * @param {string} input - The string to test.
  * @returns {boolean}
  */
 export function isBip21Request(input: string): boolean;
@@ -12,25 +12,33 @@ export function isBip21Request(input: string): boolean;
  * Supports:
  *   bitcoin:<address>[?amount=<btc>][&label=<label>][&message=<message>]
  *
- * @param {string} input
+ * @param {string} input - The BIP-21 URI string to parse.
  * @returns {Bip21ParseResult}
  */
 export function parseBip21Request(input: string): Bip21ParseResult;
 /**
  * Encodes a BIP-21 Bitcoin payment URI from a request object.
  *
- * @param {Bip21Request} request
+ * @param {Bip21Request} request - The payment request object to encode.
  * @returns {string}
  */
 export function encodeBip21Request(request: Bip21Request): string;
 export type Bip21Request = {
-    /** Validated Bitcoin address */
+    /**
+     * - Validated Bitcoin address
+     */
     address: string;
-    /** Decimal BTC amount, up to 8 decimal places (e.g. '0.001') */
+    /**
+     * - Decimal BTC amount, up to 8 decimal places (e.g. '0.001')
+     */
     amount?: string;
-    /** URL-decoded label */
+    /**
+     * - URL-decoded label
+     */
     label?: string;
-    /** URL-decoded message */
+    /**
+     * - URL-decoded message
+     */
     message?: string;
 };
 export type Bip21ParseSuccess = {

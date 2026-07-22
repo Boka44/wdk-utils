@@ -16,6 +16,10 @@
 import { createBase58check, bech32, bech32m } from '@scure/base'
 import { sha256 } from '@noble/hashes/sha2.js'
 
+/** @typedef {import("./types.js").AddressValidationSuccess} BtcAddressValidationSuccess */
+/** @typedef {import("./types.js").AddressValidationFailure} BtcAddressValidationFailure */
+/** @typedef {import("./types.js").AddressValidationResult} BtcAddressValidationResult */
+
 /**
  * Bitcoin address validation.
  * Validates format and checksum for bitcoin, testnet, and regtest addresses.
@@ -42,12 +46,6 @@ const NETWORKS = {
 }
 
 const WITNESS_VERSION_BECH32 = 0
-
-/**
- * @typedef {{ success: true, type: 'p2pkh' | 'p2sh' | 'bech32' | 'bech32m', network: 'bitcoin' | 'testnet' | 'regtest' }} BtcAddressValidationSuccess
- * @typedef {{ success: false, reason: string }} BtcAddressValidationFailure
- * @typedef {BtcAddressValidationSuccess | BtcAddressValidationFailure} BtcAddressValidationResult
- */
 
 /**
  * Decodes a Base58Check address and validates its payload length.

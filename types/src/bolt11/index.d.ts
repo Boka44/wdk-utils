@@ -36,18 +36,51 @@ export function sign(invoiceData: DecodedLightningInvoice, privateKey: string | 
 export function encode(invoiceData: DecodedLightningInvoice): LightningInvoiceEncodingResult;
 export type TagData = string | number | Uint8Array;
 export type Tag = {
+    /**
+     * - BOLT11 tag name (e.g. 'payment_hash', 'description')
+     */
     tagName: string;
+    /**
+     * - Decoded tag value
+     */
     data: TagData;
 };
 export type DecodedLightningInvoice = {
+    /**
+     * - Bitcoin network the invoice is for
+     */
     network: "bitcoin" | "regtest" | "testnet" | "signet";
+    /**
+     * - Invoice amount in millisatoshis
+     */
     millisatoshis?: string | null;
+    /**
+     * - Invoice creation time (Unix seconds)
+     */
     timestamp?: number;
+    /**
+     * - Invoice expiry time (Unix seconds)
+     */
     timeExpireDate?: number;
+    /**
+     * - Payee node public key (hex)
+     */
     payeeNodeKey?: string;
+    /**
+     * - Invoice signature (hex)
+     */
     signature?: string;
+    /**
+     * - Signature recovery flag
+     */
     recoveryFlag?: number;
+    /**
+     * - List of tagged fields
+     */
     tags: Tag[];
+    /**
+     * - Original encoded payment request string
+     */
     paymentRequest?: string;
 };
 export type LightningInvoiceValidationSuccess = {

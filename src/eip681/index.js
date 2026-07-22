@@ -27,12 +27,11 @@ const SUPPORTED_SCHEMES = [
 const EIP681_PREFIX_REGEX = /^[a-z][a-z0-9+.-]*:/i
 
 /**
- * @typedef {{
- *   recipient: string - EVM address of the transfer recipient
- *   tokenAddress: string - Token contract address (0x-prefixed hex)
- *   chainId: number - EVM chain ID
- *   amountSmallest: string - Token amount in smallest unit as an integer string (e.g. '1000000' for 1 USDT)
- * }} Eip681TransferRequest
+ * @typedef {object} Eip681TransferRequest
+ * @property {string} recipient - EVM address of the transfer recipient
+ * @property {string} tokenAddress - Token contract address (0x-prefixed hex)
+ * @property {number} chainId - EVM chain ID
+ * @property {string} amountSmallest - Token amount in smallest unit as an integer string (e.g. '1000000' for 1 USDT)
  */
 
 /**

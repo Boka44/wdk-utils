@@ -16,15 +16,13 @@
 import { sha256 } from '@noble/hashes/sha2.js'
 import { base58 } from '@scure/base'
 
+/** @typedef {import("./types.js").AddressValidationSuccess} TronAddressValidationSuccess */
+/** @typedef {import("./types.js").AddressValidationFailure} TronAddressValidationFailure */
+/** @typedef {import("./types.js").AddressValidationResult} TronAddressValidationResult */
+
 const TRON_ADDRESS_PREFIX_BYTE = 0x41
 const TRON_ADDRESS_PREFIX = 'T'
 const TRON_ADDRESS_LENGTH = 34
-
-/**
- * @typedef {{ success: true, type: 'tron' }} TronAddressValidationSuccess
- * @typedef {{ success: false, reason: string }} TronAddressValidationFailure
- * @typedef {TronAddressValidationSuccess | TronAddressValidationFailure} TronAddressValidationResult
- */
 
 /**
  * Validates a Tron address.
