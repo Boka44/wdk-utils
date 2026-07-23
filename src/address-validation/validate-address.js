@@ -30,18 +30,38 @@ const VALIDATORS = {
   tron: validateTronAddress
 }
 
+/** bip122 chain references (genesis block hashes) → Bitcoin network label. */
+const BITCOIN_NETWORKS = {
+  '000000000019d6689c085ae165831e93': 'bitcoin',
+  '000000000933ea01ad0ee984209779ba': 'testnet',
+  '0f9188f13cb7b2c71f2a335e3a4fc328': 'regtest'
+}
+
 /**
  * Validates an address for the chain identified by a CAIP-2 chain id.
- * Dispatches to the chain-specific validator and returns its result
- * unchanged, including chain-specific fields such as `type` and `network`.
+ * Dispatches to the chain-specific validator and returns its result,
+ * including chain-specific fields such as `type` and `network`.
+ *
+ * Bitcoin addresses encode their network, so for bip122 chain ids the
+ * reference selects the expected network and a
+ * mismatching address fails with NETWORK_MISMATCH. A bare bip122
+ * namespace or an unknown reference also fails with NETWORK_MISMATCH,
+ * since the expected network cannot be confirmed.
  *
  * @param {string} chainId - A CAIP-2 chain id (e.g. "eip155:1") or a bare chain namespace (e.g. "eip155").
  * @param {string} address - The address to validate.
- * @returns {AddressValidationResult | null} The chain validator's result, or `null` when no validator exists for the chain namespace.
+ * @returns {AddressValidationResult} The chain validator's result, or `{ success: false, reason: 'UNSUPPORTED_CHAIN' }` when no validator exists for the chain namespace.
  */
 export function validateAddress (chainId, address) {
-  const namespace = chainId.split(':')[0]
+  const [namespace, reference] = chainId.split(':')
   const validate = VALIDATORS[namespace]
+  if (!validate) return { success: false, reason: 'UNSUPPORTED_CHAIN' }
 
-  return validate ? validate(address) : null
+  const result = validate(address)
+  if (!result.success) return result
+
+  if (namespace === 'bip122' && result.network !== BITCOIN_NETWORKS[reference]) {
+    return { success: false, reason: 'NETWORK_MISMATCH' }
+  }
+  return result
 }

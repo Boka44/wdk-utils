@@ -141,7 +141,7 @@ console.log(recovered === mnemonic); // true
 
 | Function | Input | Returns on success | Returns on failure |
 |---|---|---|---|
-| `validateAddress(chainId, address)` | CAIP-2 chain id (e.g. `'eip155:1'`) and address string | The chain validator's result (see rows below) | `{ success: false, reason: string }`, or `null` when the chain namespace has no validator |
+| `validateAddress(chainId, address)` | CAIP-2 chain id (e.g. `'eip155:1'`) and address string | The chain validator's result (see rows below). For `bip122` chain ids the reference also selects the expected Bitcoin network | `{ success: false, reason: string }` — `'NETWORK_MISMATCH'` when a Bitcoin address belongs to another network or the `bip122` reference is missing or unknown, `'UNSUPPORTED_CHAIN'` when the chain namespace has no validator |
 | `validateBitcoinAddress(address)` | Bitcoin address string | `{ success: true, type: 'p2pkh' \| 'p2sh' \| 'bech32' \| 'bech32m', network: 'bitcoin' \| 'testnet' \| 'regtest' }` | `{ success: false, reason: string }` |
 | `validateEVMAddress(address)` | EVM address string | `{ success: true, type: 'evm' }` | `{ success: false, reason: string }` |
 | `validateLightningInvoice(invoice)` | BOLT-11 invoice string | `{ success: true, type: 'invoice' }` | `{ success: false, reason: string }` |

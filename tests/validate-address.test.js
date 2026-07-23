@@ -57,9 +57,33 @@ describe('validateAddress', () => {
     expect(result).toEqual({ success: false, reason: 'INVALID_FORMAT' })
   })
 
-  it('returns null for a chain namespace without a validator', () => {
+  it('returns UNSUPPORTED_CHAIN for a chain namespace without a validator', () => {
     const result = validateAddress('ton:mainnet', 'EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs')
 
-    expect(result).toBeNull()
+    expect(result).toEqual({ success: false, reason: 'UNSUPPORTED_CHAIN' })
+  })
+
+  it('rejects a testnet address for the Bitcoin mainnet chain id', () => {
+    const result = validateAddress('bip122:000000000019d6689c085ae165831e93', 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx')
+
+    expect(result).toEqual({ success: false, reason: 'NETWORK_MISMATCH' })
+  })
+
+  it('rejects a mainnet address for the Bitcoin testnet chain id', () => {
+    const result = validateAddress('bip122:000000000933ea01ad0ee984209779ba', '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa')
+
+    expect(result).toEqual({ success: false, reason: 'NETWORK_MISMATCH' })
+  })
+
+  it('rejects an unknown bip122 reference', () => {
+    const result = validateAddress('bip122:ffffffffffffffffffffffffffffffff', '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa')
+
+    expect(result).toEqual({ success: false, reason: 'NETWORK_MISMATCH' })
+  })
+
+  it('rejects a bare bip122 namespace without a reference', () => {
+    const result = validateAddress('bip122', 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx')
+
+    expect(result).toEqual({ success: false, reason: 'NETWORK_MISMATCH' })
   })
 })
