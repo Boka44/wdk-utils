@@ -6,6 +6,9 @@
  * @returns {EvmAddressValidationResult}
  */
 export function validateEVMAddress(address: string): EvmAddressValidationResult;
-export type EvmAddressValidationSuccess = import("./types.js").AddressValidationSuccess;
 export type EvmAddressValidationFailure = import("./types.js").AddressValidationFailure;
-export type EvmAddressValidationResult = import("./types.js").AddressValidationResult;
+export type EvmAddressValidationSuccess = {
+    success: true;
+    type: "evm";
+};
+export type EvmAddressValidationResult = EvmAddressValidationSuccess | EvmAddressValidationFailure;

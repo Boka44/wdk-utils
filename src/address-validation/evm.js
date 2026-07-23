@@ -22,9 +22,9 @@
 // eslint-disable-next-line camelcase
 import { keccak_256 } from '@noble/hashes/sha3.js'
 
-/** @typedef {import("./types.js").AddressValidationSuccess} EvmAddressValidationSuccess */
 /** @typedef {import("./types.js").AddressValidationFailure} EvmAddressValidationFailure */
-/** @typedef {import("./types.js").AddressValidationResult} EvmAddressValidationResult */
+/** @typedef {{ success: true, type: 'evm' }} EvmAddressValidationSuccess */
+/** @typedef {EvmAddressValidationSuccess | EvmAddressValidationFailure} EvmAddressValidationResult */
 
 function isValidEIP55Checksum (address) {
   const hexPart = address.slice(2)

@@ -15,9 +15,9 @@
 
 import { base58 } from '@scure/base'
 
-/** @typedef {import("./types.js").AddressValidationSuccess} SolanaAddressValidationSuccess */
 /** @typedef {import("./types.js").AddressValidationFailure} SolanaAddressValidationFailure */
-/** @typedef {import("./types.js").AddressValidationResult} SolanaAddressValidationResult */
+/** @typedef {{ success: true, type: 'solana' }} SolanaAddressValidationSuccess */
+/** @typedef {SolanaAddressValidationSuccess | SolanaAddressValidationFailure} SolanaAddressValidationResult */
 
 const SOLANA_PUBLIC_KEY_LENGTH = 32
 const SOLANA_ADDRESS_MIN_LENGTH = 32

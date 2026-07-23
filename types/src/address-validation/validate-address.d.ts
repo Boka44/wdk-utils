@@ -4,7 +4,7 @@
  * including chain-specific fields such as `type` and `network`.
  *
  * Bitcoin addresses encode their network, so for bip122 chain ids the
- * reference (genesis block hash) selects the expected network and a
+ * reference selects the expected network and a
  * mismatching address fails with NETWORK_MISMATCH. A bare bip122
  * namespace or an unknown reference also fails with NETWORK_MISMATCH,
  * since the expected network cannot be confirmed.

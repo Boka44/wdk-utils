@@ -1,4 +1,4 @@
-export function validateBase58(address: any): import("./types.js").AddressValidationSuccess | {
+export function validateBase58(address: any): BtcAddressValidationSuccess | {
     decoded: Uint8Array;
 } | {
     success: boolean;
@@ -23,6 +23,10 @@ export function validateBech32m(address: string): BtcAddressValidationResult;
  * @returns {BtcAddressValidationResult}
  */
 export function validateBitcoinAddress(address: string): BtcAddressValidationResult;
-export type BtcAddressValidationSuccess = import("./types.js").AddressValidationSuccess;
 export type BtcAddressValidationFailure = import("./types.js").AddressValidationFailure;
-export type BtcAddressValidationResult = import("./types.js").AddressValidationResult;
+export type BtcAddressValidationSuccess = {
+    success: true;
+    type: "p2pkh" | "p2sh" | "bech32" | "bech32m";
+    network: "bitcoin" | "testnet" | "regtest";
+};
+export type BtcAddressValidationResult = BtcAddressValidationSuccess | BtcAddressValidationFailure;

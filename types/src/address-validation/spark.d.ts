@@ -7,6 +7,9 @@
  * @returns {SparkAddressValidationResult}
  */
 export function validateSparkAddress(address: string): SparkAddressValidationResult;
-export type SparkAddressValidationSuccess = import("./types.js").AddressValidationSuccess;
 export type SparkAddressValidationFailure = import("./types.js").AddressValidationFailure;
-export type SparkAddressValidationResult = import("./types.js").AddressValidationResult;
+export type SparkAddressValidationSuccess = {
+    success: true;
+    type: "spark" | "btc";
+};
+export type SparkAddressValidationResult = SparkAddressValidationSuccess | SparkAddressValidationFailure;

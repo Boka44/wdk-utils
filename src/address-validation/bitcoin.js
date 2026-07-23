@@ -16,9 +16,9 @@
 import { createBase58check, bech32, bech32m } from '@scure/base'
 import { sha256 } from '@noble/hashes/sha2.js'
 
-/** @typedef {import("./types.js").AddressValidationSuccess} BtcAddressValidationSuccess */
 /** @typedef {import("./types.js").AddressValidationFailure} BtcAddressValidationFailure */
-/** @typedef {import("./types.js").AddressValidationResult} BtcAddressValidationResult */
+/** @typedef {{ success: true, type: 'p2pkh' | 'p2sh' | 'bech32' | 'bech32m', network: 'bitcoin' | 'testnet' | 'regtest' }} BtcAddressValidationSuccess */
+/** @typedef {BtcAddressValidationSuccess | BtcAddressValidationFailure} BtcAddressValidationResult */
 
 /**
  * Bitcoin address validation.

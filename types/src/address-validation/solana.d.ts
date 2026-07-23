@@ -9,6 +9,9 @@
  * @returns {SolanaAddressValidationResult}
  */
 export function validateSolanaAddress(address: string): SolanaAddressValidationResult;
-export type SolanaAddressValidationSuccess = import("./types.js").AddressValidationSuccess;
 export type SolanaAddressValidationFailure = import("./types.js").AddressValidationFailure;
-export type SolanaAddressValidationResult = import("./types.js").AddressValidationResult;
+export type SolanaAddressValidationSuccess = {
+    success: true;
+    type: "solana";
+};
+export type SolanaAddressValidationResult = SolanaAddressValidationSuccess | SolanaAddressValidationFailure;
