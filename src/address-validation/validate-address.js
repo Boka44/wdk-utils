@@ -19,7 +19,16 @@ import { validateSolanaAddress } from './solana.js'
 import { validateSparkAddress } from './spark.js'
 import { validateTronAddress } from './tron.js'
 
-/** @typedef {import("./types.js").AddressValidationResult} AddressValidationResult */
+/** @typedef {import("./types.js").AddressValidationFailure} AddressValidationFailure */
+/** @typedef {import("./bitcoin.js").BtcAddressValidationResult} BtcAddressValidationResult */
+/** @typedef {import("./evm.js").EvmAddressValidationResult} EvmAddressValidationResult */
+/** @typedef {import("./solana.js").SolanaAddressValidationResult} SolanaAddressValidationResult */
+/** @typedef {import("./spark.js").SparkAddressValidationResult} SparkAddressValidationResult */
+/** @typedef {import("./tron.js").TronAddressValidationResult} TronAddressValidationResult */
+
+/**
+ * @typedef {BtcAddressValidationResult | EvmAddressValidationResult | SolanaAddressValidationResult | SparkAddressValidationResult | TronAddressValidationResult | AddressValidationFailure} ValidateAddressResult
+ */
 
 /** Address validators by CAIP-2 chain namespace. */
 const VALIDATORS = {
@@ -30,6 +39,9 @@ const VALIDATORS = {
   tron: validateTronAddress
 }
 
+/** CAIP-2 chain id: a namespace, optionally followed by a ":reference". */
+const CHAIN_ID_RE = /^[-a-z0-9]{3,8}(:[-_a-zA-Z0-9]{1,32})?$/
+
 /** bip122 chain references (genesis block hashes) → Bitcoin network label. */
 const BITCOIN_NETWORKS = {
   '000000000019d6689c085ae165831e93': 'bitcoin',
@@ -38,21 +50,39 @@ const BITCOIN_NETWORKS = {
 }
 
 /**
+ * Returns whether a validated Bitcoin address matches the expected network.
+ * Legacy testnet and regtest addresses share the same version bytes and are
+ * reported as testnet, so p2pkh/p2sh testnet results also match regtest.
+ *
+ * @param {{ type: string, network?: string }} result
+ * @param {string} [expected]
+ * @returns {boolean}
+ */
+function _matchesBitcoinNetwork (result, expected) {
+  if (result.network === expected) return true
+  return expected === 'regtest' && result.network === 'testnet' &&
+    (result.type === 'p2pkh' || result.type === 'p2sh')
+}
+
+/**
  * Validates an address for the chain identified by a CAIP-2 chain id.
  * Dispatches to the chain-specific validator and returns its result,
  * including chain-specific fields such as `type` and `network`.
  *
- * Bitcoin addresses encode their network, so for bip122 chain ids the
- * reference selects the expected network and a
- * mismatching address fails with NETWORK_MISMATCH. A bare bip122
- * namespace or an unknown reference also fails with NETWORK_MISMATCH,
- * since the expected network cannot be confirmed.
+ * Bitcoin and Spark addresses encode their network, so for bip122 and spark
+ * chain ids the reference selects the expected network and a mismatching
+ * address fails with NETWORK_MISMATCH — as does a missing or unknown
+ * reference, since the expected network cannot be confirmed.
  *
  * @param {string} chainId - A CAIP-2 chain id (e.g. "eip155:1") or a bare chain namespace (e.g. "eip155").
  * @param {string} address - The address to validate.
- * @returns {AddressValidationResult} The chain validator's result, or `{ success: false, reason: 'UNSUPPORTED_CHAIN' }` when no validator exists for the chain namespace.
+ * @returns {ValidateAddressResult} The chain validator's result; INVALID_CHAIN_ID for a malformed chain id, UNSUPPORTED_CHAIN when the chain namespace has no validator.
  */
 export function validateAddress (chainId, address) {
+  if (!CHAIN_ID_RE.test(chainId)) {
+    return { success: false, reason: 'INVALID_CHAIN_ID' }
+  }
+
   const [namespace, reference] = chainId.split(':')
   const validate = VALIDATORS[namespace]
   if (!validate) return { success: false, reason: 'UNSUPPORTED_CHAIN' }
@@ -60,7 +90,10 @@ export function validateAddress (chainId, address) {
   const result = validate(address)
   if (!result.success) return result
 
-  if (namespace === 'bip122' && result.network !== BITCOIN_NETWORKS[reference]) {
+  if (namespace === 'bip122' && !_matchesBitcoinNetwork(result, BITCOIN_NETWORKS[reference])) {
+    return { success: false, reason: 'NETWORK_MISMATCH' }
+  }
+  if (namespace === 'spark' && result.network !== reference) {
     return { success: false, reason: 'NETWORK_MISMATCH' }
   }
   return result

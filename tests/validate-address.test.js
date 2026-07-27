@@ -36,7 +36,7 @@ describe('validateAddress', () => {
   it('dispatches spark chain ids to the Spark validator', () => {
     const result = validateAddress('spark:mainnet', 'spark1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8w6hqs2')
 
-    expect(result).toEqual({ success: true, type: 'spark' })
+    expect(result).toEqual({ success: true, type: 'spark', network: 'mainnet' })
   })
 
   it('dispatches tron chain ids to the Tron validator', () => {
@@ -85,5 +85,40 @@ describe('validateAddress', () => {
     const result = validateAddress('bip122', 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx')
 
     expect(result).toEqual({ success: false, reason: 'NETWORK_MISMATCH' })
+  })
+
+  it('rejects malformed chain ids', () => {
+    expect(validateAddress('eip155:', '0x742d35Cc6634C0532925a3b844Bc454e4438f44e')).toEqual({ success: false, reason: 'INVALID_CHAIN_ID' })
+    expect(validateAddress('eip155:1:extra', '0x742d35Cc6634C0532925a3b844Bc454e4438f44e')).toEqual({ success: false, reason: 'INVALID_CHAIN_ID' })
+  })
+
+  it('accepts a legacy testnet-format address for the Bitcoin regtest chain id', () => {
+    const result = validateAddress('bip122:0f9188f13cb7b2c71f2a335e3a4fc328', 'mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn')
+
+    expect(result).toEqual({ success: true, type: 'p2pkh', network: 'testnet' })
+  })
+
+  it('rejects a bech32 testnet address for the Bitcoin regtest chain id', () => {
+    const result = validateAddress('bip122:0f9188f13cb7b2c71f2a335e3a4fc328', 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx')
+
+    expect(result).toEqual({ success: false, reason: 'NETWORK_MISMATCH' })
+  })
+
+  it('rejects a Spark address from another network', () => {
+    const result = validateAddress('spark:mainnet', 'sparkrt1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8uueuu4')
+
+    expect(result).toEqual({ success: false, reason: 'NETWORK_MISMATCH' })
+  })
+
+  it('rejects a testnet L1 address for the Spark mainnet chain id', () => {
+    const result = validateAddress('spark:mainnet', 'tb1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vq47zagq')
+
+    expect(result).toEqual({ success: false, reason: 'NETWORK_MISMATCH' })
+  })
+
+  it('accepts a Spark regtest address for the Spark regtest chain id', () => {
+    const result = validateAddress('spark:regtest', 'sparkrt1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8uueuu4')
+
+    expect(result).toEqual({ success: true, type: 'spark', network: 'regtest' })
   })
 })

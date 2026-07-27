@@ -3,15 +3,20 @@
  * Dispatches to the chain-specific validator and returns its result,
  * including chain-specific fields such as `type` and `network`.
  *
- * Bitcoin addresses encode their network, so for bip122 chain ids the
- * reference selects the expected network and a
- * mismatching address fails with NETWORK_MISMATCH. A bare bip122
- * namespace or an unknown reference also fails with NETWORK_MISMATCH,
- * since the expected network cannot be confirmed.
+ * Bitcoin and Spark addresses encode their network, so for bip122 and spark
+ * chain ids the reference selects the expected network and a mismatching
+ * address fails with NETWORK_MISMATCH — as does a missing or unknown
+ * reference, since the expected network cannot be confirmed.
  *
  * @param {string} chainId - A CAIP-2 chain id (e.g. "eip155:1") or a bare chain namespace (e.g. "eip155").
  * @param {string} address - The address to validate.
- * @returns {AddressValidationResult} The chain validator's result, or `{ success: false, reason: 'UNSUPPORTED_CHAIN' }` when no validator exists for the chain namespace.
+ * @returns {ValidateAddressResult} The chain validator's result; INVALID_CHAIN_ID for a malformed chain id, UNSUPPORTED_CHAIN when the chain namespace has no validator.
  */
-export function validateAddress(chainId: string, address: string): AddressValidationResult;
-export type AddressValidationResult = import("./types.js").AddressValidationResult;
+export function validateAddress(chainId: string, address: string): ValidateAddressResult;
+export type AddressValidationFailure = import("./types.js").AddressValidationFailure;
+export type BtcAddressValidationResult = import("./bitcoin.js").BtcAddressValidationResult;
+export type EvmAddressValidationResult = import("./evm.js").EvmAddressValidationResult;
+export type SolanaAddressValidationResult = import("./solana.js").SolanaAddressValidationResult;
+export type SparkAddressValidationResult = import("./spark.js").SparkAddressValidationResult;
+export type TronAddressValidationResult = import("./tron.js").TronAddressValidationResult;
+export type ValidateAddressResult = BtcAddressValidationResult | EvmAddressValidationResult | SolanaAddressValidationResult | SparkAddressValidationResult | TronAddressValidationResult | AddressValidationFailure;
