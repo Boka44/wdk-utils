@@ -17,10 +17,29 @@ import { bech32m } from '@scure/base'
 import { validateBech32m } from './bitcoin.js'
 
 /** @typedef {import("./types.js").AddressValidationFailure} SparkAddressValidationFailure */
-/** @typedef {{ success: true, type: 'spark' | 'btc' }} SparkAddressValidationSuccess */
+/** @typedef {{ success: true, type: 'spark' | 'btc', network: 'mainnet' | 'testnet' | 'regtest' | 'signet' | 'local' }} SparkAddressValidationSuccess */
 /** @typedef {SparkAddressValidationSuccess | SparkAddressValidationFailure} SparkAddressValidationResult */
 
-const VALID_PREFIXES = ['spark', 'sparkrt', 'sparkt', 'sparks', 'sparkl']
+const PREFIX_NETWORKS = {
+  spark: 'mainnet',
+  sparkt: 'testnet',
+  sparkrt: 'regtest',
+  sparks: 'signet',
+  sparkl: 'local'
+}
+
+/**
+ * Validates a Bitcoin L1 deposit address, mapping the Bitcoin network label
+ * to the Spark network vocabulary.
+ *
+ * @param {string} address The address to validate.
+ * @returns {SparkAddressValidationResult}
+ */
+function _validateL1Address (address) {
+  const btc = validateBech32m(address)
+  if (!btc.success) return { success: false, reason: 'INVALID_FORMAT' }
+  return { success: true, type: 'btc', network: btc.network === 'bitcoin' ? 'mainnet' : btc.network }
+}
 
 /**
  * Validates a Spark address.
@@ -50,20 +69,13 @@ export function validateSparkAddress (address) {
   try {
     decoded = bech32m.decode(lower)
   } catch (e) {
-    if (validateBech32m(trimmed).success) {
-      return { success: true, type: 'btc' }
-    }
-
-    return { success: false, reason: 'INVALID_FORMAT' }
+    return _validateL1Address(trimmed)
   }
 
-  if (VALID_PREFIXES.includes(decoded.prefix)) {
-    return { success: true, type: 'spark' }
+  const network = PREFIX_NETWORKS[decoded.prefix]
+  if (network) {
+    return { success: true, type: 'spark', network }
   }
 
-  if (validateBech32m(trimmed).success) {
-    return { success: true, type: 'btc' }
-  }
-
-  return { success: false, reason: 'INVALID_FORMAT' }
+  return _validateL1Address(trimmed)
 }

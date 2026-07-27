@@ -8,11 +8,21 @@ describe('validateSparkAddress', () => {
 
   describe('Valid Addresses', () => {
     it('returns success for a mainnet Spark address', () => {
-      expect(validateSparkAddress(validSparkMainnet)).toEqual({ success: true, type: 'spark' })
+      expect(validateSparkAddress(validSparkMainnet)).toEqual({ success: true, type: 'spark', network: 'mainnet' })
+    })
+
+    it('returns success for a regtest Spark address', () => {
+      const validSparkRegtest = 'sparkrt1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8uueuu4'
+      expect(validateSparkAddress(validSparkRegtest)).toEqual({ success: true, type: 'spark', network: 'regtest' })
     })
 
     it('returns success with type "btc" for a valid Bitcoin address', () => {
-      expect(validateSparkAddress(validBtcAddress)).toEqual({ success: true, type: 'btc' })
+      expect(validateSparkAddress(validBtcAddress)).toEqual({ success: true, type: 'btc', network: 'mainnet' })
+    })
+
+    it('returns the Bitcoin network for a testnet L1 address', () => {
+      const testnetTaproot = 'tb1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vq47zagq'
+      expect(validateSparkAddress(testnetTaproot)).toEqual({ success: true, type: 'btc', network: 'testnet' })
     })
   })
 

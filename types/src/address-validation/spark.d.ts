@@ -11,5 +11,6 @@ export type SparkAddressValidationFailure = import("./types.js").AddressValidati
 export type SparkAddressValidationSuccess = {
     success: true;
     type: "spark" | "btc";
+    network: "mainnet" | "testnet" | "regtest" | "signet" | "local";
 };
 export type SparkAddressValidationResult = SparkAddressValidationSuccess | SparkAddressValidationFailure;

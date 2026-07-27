@@ -115,7 +115,7 @@ console.log(solResult) // { success: true, type: 'solana' }
 
 // Spark Address Validation
 const sparkResult = validateSparkAddress('...')
-console.log(sparkResult) // { success: true, type: 'spark' | 'btc' }
+console.log(sparkResult) // { success: true, type: 'spark' | 'btc', network: 'mainnet' }
 
 const umaResult = validateUmaAddress('$user@domain.com')
 console.log(umaResult) // { success: true, type: 'uma' }
@@ -141,13 +141,13 @@ console.log(recovered === mnemonic); // true
 
 | Function | Input | Returns on success | Returns on failure |
 |---|---|---|---|
-| `validateAddress(chainId, address)` | CAIP-2 chain id (e.g. `'eip155:1'`) and address string | The chain validator's result (see rows below). For `bip122` chain ids the reference also selects the expected Bitcoin network | `{ success: false, reason: string }` — `'NETWORK_MISMATCH'` when a Bitcoin address belongs to another network or the `bip122` reference is missing or unknown, `'UNSUPPORTED_CHAIN'` when the chain namespace has no validator |
+| `validateAddress(chainId, address)` | CAIP-2 chain id (e.g. `'eip155:1'`) and address string | The chain validator's result (see rows below). For `bip122` and `spark` chain ids the reference also selects the expected network | `{ success: false, reason: string }` — `'NETWORK_MISMATCH'` when a Bitcoin or Spark address belongs to another network or the reference is missing or unknown, `'UNSUPPORTED_CHAIN'` when the chain namespace has no validator, `'INVALID_CHAIN_ID'` for a malformed chain id |
 | `validateBitcoinAddress(address)` | Bitcoin address string | `{ success: true, type: 'p2pkh' \| 'p2sh' \| 'bech32' \| 'bech32m', network: 'bitcoin' \| 'testnet' \| 'regtest' }` | `{ success: false, reason: string }` |
 | `validateEVMAddress(address)` | EVM address string | `{ success: true, type: 'evm' }` | `{ success: false, reason: string }` |
 | `validateLightningInvoice(invoice)` | BOLT-11 invoice string | `{ success: true, type: 'invoice' }` | `{ success: false, reason: string }` |
 | `validateLightningAddress(address)` | Lightning address string | `{ success: true, type: 'address' }` | `{ success: false, reason: string }` |
 | `validateSolanaAddress(address)` | Solana address string | `{ success: true, type: 'solana' }` | `{ success: false, reason: string }` |
-| `validateSparkAddress(address)` | Spark address string | `{ success: true, type: 'spark' \| 'btc' }` | `{ success: false, reason: string }` |
+| `validateSparkAddress(address)` | Spark address string | `{ success: true, type: 'spark' \| 'btc', network: 'mainnet' \| 'testnet' \| 'regtest' \| 'signet' \| 'local' }` | `{ success: false, reason: string }` |
 | `validateUmaAddress(address)` | UMA string (`$user@domain`) | `{ success: true, type: 'uma' }` | `{ success: false, reason: string }` |
 
 ### Payment URI Parsing
