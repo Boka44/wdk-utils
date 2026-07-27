@@ -16,6 +16,21 @@ describe('validateSparkAddress', () => {
       expect(validateSparkAddress(validSparkRegtest)).toEqual({ success: true, type: 'spark', network: 'regtest' })
     })
 
+    it('returns success for a testnet Spark address', () => {
+      const validSparkTestnet = 'sparkt1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8cgyjr4'
+      expect(validateSparkAddress(validSparkTestnet)).toEqual({ success: true, type: 'spark', network: 'testnet' })
+    })
+
+    it('returns success for a signet Spark address', () => {
+      const validSparkSignet = 'sparks1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv87e9wnx'
+      expect(validateSparkAddress(validSparkSignet)).toEqual({ success: true, type: 'spark', network: 'signet' })
+    })
+
+    it('returns success for a local Spark address', () => {
+      const validSparkLocal = 'sparkl1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8th0fhu'
+      expect(validateSparkAddress(validSparkLocal)).toEqual({ success: true, type: 'spark', network: 'local' })
+    })
+
     it('returns success with type "btc" for a valid Bitcoin address', () => {
       expect(validateSparkAddress(validBtcAddress)).toEqual({ success: true, type: 'btc', network: 'mainnet' })
     })

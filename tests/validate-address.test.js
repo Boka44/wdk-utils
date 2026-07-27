@@ -92,16 +92,34 @@ describe('validateAddress', () => {
     expect(validateAddress('eip155:1:extra', '0x742d35Cc6634C0532925a3b844Bc454e4438f44e')).toEqual({ success: false, reason: 'INVALID_CHAIN_ID' })
   })
 
-  it('accepts a legacy testnet-format address for the Bitcoin regtest chain id', () => {
+  it('rejects a non-string chain id', () => {
+    expect(validateAddress(null, '0x742d35Cc6634C0532925a3b844Bc454e4438f44e')).toEqual({ success: false, reason: 'INVALID_CHAIN_ID' })
+    expect(validateAddress(undefined, '0x742d35Cc6634C0532925a3b844Bc454e4438f44e')).toEqual({ success: false, reason: 'INVALID_CHAIN_ID' })
+    expect(validateAddress(1, '0x742d35Cc6634C0532925a3b844Bc454e4438f44e')).toEqual({ success: false, reason: 'INVALID_CHAIN_ID' })
+  })
+
+  it('accepts a legacy testnet-format address for the Bitcoin regtest chain id and normalizes the network', () => {
     const result = validateAddress('bip122:0f9188f13cb7b2c71f2a335e3a4fc328', 'mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn')
 
-    expect(result).toEqual({ success: true, type: 'p2pkh', network: 'testnet' })
+    expect(result).toEqual({ success: true, type: 'p2pkh', network: 'regtest' })
+  })
+
+  it('accepts a legacy testnet-format p2sh address for the Bitcoin regtest chain id and normalizes the network', () => {
+    const result = validateAddress('bip122:0f9188f13cb7b2c71f2a335e3a4fc328', '2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc')
+
+    expect(result).toEqual({ success: true, type: 'p2sh', network: 'regtest' })
   })
 
   it('rejects a bech32 testnet address for the Bitcoin regtest chain id', () => {
     const result = validateAddress('bip122:0f9188f13cb7b2c71f2a335e3a4fc328', 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx')
 
     expect(result).toEqual({ success: false, reason: 'NETWORK_MISMATCH' })
+  })
+
+  it('accepts a Bitcoin L1 deposit address for the Spark mainnet chain id', () => {
+    const result = validateAddress('spark:mainnet', 'bc1p4lpn5nrunrjdk6teyjd2z53vmv82hlgjvv4pejkhg9wz5jq86zuqsruz85')
+
+    expect(result).toEqual({ success: true, type: 'btc', network: 'mainnet' })
   })
 
   it('rejects a Spark address from another network', () => {

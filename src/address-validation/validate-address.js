@@ -72,14 +72,16 @@ function _matchesBitcoinNetwork (result, expected) {
  * Bitcoin and Spark addresses encode their network, so for bip122 and spark
  * chain ids the reference selects the expected network and a mismatching
  * address fails with NETWORK_MISMATCH — as does a missing or unknown
- * reference, since the expected network cannot be confirmed.
+ * reference, since the expected network cannot be confirmed. Legacy
+ * testnet-format addresses accepted for the regtest chain id are reported
+ * with the network normalized to "regtest".
  *
  * @param {string} chainId - A CAIP-2 chain id (e.g. "eip155:1") or a bare chain namespace (e.g. "eip155").
  * @param {string} address - The address to validate.
  * @returns {ValidateAddressResult} The chain validator's result; INVALID_CHAIN_ID for a malformed chain id, UNSUPPORTED_CHAIN when the chain namespace has no validator.
  */
 export function validateAddress (chainId, address) {
-  if (!CHAIN_ID_RE.test(chainId)) {
+  if (typeof chainId !== 'string' || !CHAIN_ID_RE.test(chainId)) {
     return { success: false, reason: 'INVALID_CHAIN_ID' }
   }
 
@@ -90,8 +92,14 @@ export function validateAddress (chainId, address) {
   const result = validate(address)
   if (!result.success) return result
 
-  if (namespace === 'bip122' && !_matchesBitcoinNetwork(result, BITCOIN_NETWORKS[reference])) {
-    return { success: false, reason: 'NETWORK_MISMATCH' }
+  if (namespace === 'bip122') {
+    const expected = BITCOIN_NETWORKS[reference]
+    if (!_matchesBitcoinNetwork(result, expected)) {
+      return { success: false, reason: 'NETWORK_MISMATCH' }
+    }
+    if (result.network !== expected) {
+      return { ...result, network: expected }
+    }
   }
   if (namespace === 'spark' && result.network !== reference) {
     return { success: false, reason: 'NETWORK_MISMATCH' }
