@@ -7,12 +7,11 @@
  * @returns {SparkAddressValidationResult}
  */
 export function validateSparkAddress(address: string): SparkAddressValidationResult;
+export type SparkAddressValidationFailure = import("./types.js").AddressValidationFailure;
+export type SparkNetwork = "mainnet" | "testnet" | "regtest" | "signet" | "local";
 export type SparkAddressValidationSuccess = {
     success: true;
     type: "spark" | "btc";
-};
-export type SparkAddressValidationFailure = {
-    success: false;
-    reason: string;
+    compatibleNetworks: SparkNetwork[];
 };
 export type SparkAddressValidationResult = SparkAddressValidationSuccess | SparkAddressValidationFailure;

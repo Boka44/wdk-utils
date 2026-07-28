@@ -20,12 +20,11 @@ const AMOUNT_REGEX = /^(0|[1-9]\d*)(\.\d{1,8})?$/
 const MAX_BTC = 21_000_000
 
 /**
- * @typedef {{
- *   address: string - Validated Bitcoin address
- *   amount?: string - Decimal BTC amount, up to 8 decimal places (e.g. '0.001')
- *   label?: string - URL-decoded label
- *   message?: string - URL-decoded message
- * }} Bip21Request
+ * @typedef {object} Bip21Request
+ * @property {string} address - Validated Bitcoin address
+ * @property {string} [amount] - Decimal BTC amount, up to 8 decimal places (e.g. '0.001')
+ * @property {string} [label] - URL-decoded label
+ * @property {string} [message] - URL-decoded message
  */
 
 /**

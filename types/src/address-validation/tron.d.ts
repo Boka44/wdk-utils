@@ -5,12 +5,9 @@
  * @returns {TronAddressValidationResult}
  */
 export function validateTronAddress(address: string): TronAddressValidationResult;
+export type TronAddressValidationFailure = import("./types.js").AddressValidationFailure;
 export type TronAddressValidationSuccess = {
     success: true;
     type: "tron";
-};
-export type TronAddressValidationFailure = {
-    success: false;
-    reason: string;
 };
 export type TronAddressValidationResult = TronAddressValidationSuccess | TronAddressValidationFailure;

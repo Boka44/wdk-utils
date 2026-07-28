@@ -6,3 +6,4 @@ export * from "./spark.js";
 export * from "./tron.js";
 export * from "./uma.js";
 export * from "./utils.js";
+export * from "./validate-address.js";

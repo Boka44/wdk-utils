@@ -8,11 +8,41 @@ describe('validateSparkAddress', () => {
 
   describe('Valid Addresses', () => {
     it('returns success for a mainnet Spark address', () => {
-      expect(validateSparkAddress(validSparkMainnet)).toEqual({ success: true, type: 'spark' })
+      expect(validateSparkAddress(validSparkMainnet)).toEqual({ success: true, type: 'spark', compatibleNetworks: ['mainnet'] })
+    })
+
+    it('returns success for a regtest Spark address', () => {
+      const validSparkRegtest = 'sparkrt1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8uueuu4'
+      expect(validateSparkAddress(validSparkRegtest)).toEqual({ success: true, type: 'spark', compatibleNetworks: ['regtest'] })
+    })
+
+    it('returns success for a testnet Spark address', () => {
+      const validSparkTestnet = 'sparkt1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8cgyjr4'
+      expect(validateSparkAddress(validSparkTestnet)).toEqual({ success: true, type: 'spark', compatibleNetworks: ['testnet'] })
+    })
+
+    it('returns success for a signet Spark address', () => {
+      const validSparkSignet = 'sparks1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv87e9wnx'
+      expect(validateSparkAddress(validSparkSignet)).toEqual({ success: true, type: 'spark', compatibleNetworks: ['signet'] })
+    })
+
+    it('returns success for a local Spark address', () => {
+      const validSparkLocal = 'sparkl1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8th0fhu'
+      expect(validateSparkAddress(validSparkLocal)).toEqual({ success: true, type: 'spark', compatibleNetworks: ['local'] })
     })
 
     it('returns success with type "btc" for a valid Bitcoin address', () => {
-      expect(validateSparkAddress(validBtcAddress)).toEqual({ success: true, type: 'btc' })
+      expect(validateSparkAddress(validBtcAddress)).toEqual({ success: true, type: 'btc', compatibleNetworks: ['mainnet'] })
+    })
+
+    it('returns testnet and signet as compatible networks for a testnet L1 address', () => {
+      const testnetTaproot = 'tb1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vq47zagq'
+      expect(validateSparkAddress(testnetTaproot)).toEqual({ success: true, type: 'btc', compatibleNetworks: ['testnet', 'signet'] })
+    })
+
+    it('returns regtest and local as compatible networks for a regtest L1 address', () => {
+      const regtestTaproot = 'bcrt1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqc8gma6'
+      expect(validateSparkAddress(regtestTaproot)).toEqual({ success: true, type: 'btc', compatibleNetworks: ['regtest', 'local'] })
     })
   })
 

@@ -22,6 +22,10 @@
 // eslint-disable-next-line camelcase
 import { keccak_256 } from '@noble/hashes/sha3.js'
 
+/** @typedef {import("./types.js").AddressValidationFailure} EvmAddressValidationFailure */
+/** @typedef {{ success: true, type: 'evm' }} EvmAddressValidationSuccess */
+/** @typedef {EvmAddressValidationSuccess | EvmAddressValidationFailure} EvmAddressValidationResult */
+
 function isValidEIP55Checksum (address) {
   const hexPart = address.slice(2)
   if (hexPart === hexPart.toLowerCase()) {
@@ -50,12 +54,6 @@ function isValidEIP55Checksum (address) {
     return false
   }
 }
-
-/**
- * @typedef {{ success: true, type: 'evm' }} EvmAddressValidationSuccess
- * @typedef {{ success: false, reason: string }} EvmAddressValidationFailure
- * @typedef {EvmAddressValidationSuccess | EvmAddressValidationFailure} EvmAddressValidationResult
- */
 
 /**
  * Validates an EVM address (format + optional EIP-55 checksum).
