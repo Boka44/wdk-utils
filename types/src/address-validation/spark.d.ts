@@ -8,9 +8,10 @@
  */
 export function validateSparkAddress(address: string): SparkAddressValidationResult;
 export type SparkAddressValidationFailure = import("./types.js").AddressValidationFailure;
+export type SparkNetwork = "mainnet" | "testnet" | "regtest" | "signet" | "local";
 export type SparkAddressValidationSuccess = {
     success: true;
     type: "spark" | "btc";
-    network: "mainnet" | "testnet" | "regtest" | "signet" | "local";
+    compatibleNetworks: SparkNetwork[];
 };
 export type SparkAddressValidationResult = SparkAddressValidationSuccess | SparkAddressValidationFailure;

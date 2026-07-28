@@ -50,21 +50,6 @@ const BITCOIN_NETWORKS = {
 }
 
 /**
- * Returns whether a validated Bitcoin address matches the expected network.
- * Legacy testnet and regtest addresses share the same version bytes and are
- * reported as testnet, so p2pkh/p2sh testnet results also match regtest.
- *
- * @param {{ type: string, network?: string }} result
- * @param {string} [expected]
- * @returns {boolean}
- */
-function _matchesBitcoinNetwork (result, expected) {
-  if (result.network === expected) return true
-  return expected === 'regtest' && result.network === 'testnet' &&
-    (result.type === 'p2pkh' || result.type === 'p2sh')
-}
-
-/**
  * Validates an address for the chain identified by a CAIP-2 chain id.
  * Dispatches to the chain-specific validator and returns its result,
  * including chain-specific fields such as `type` and `network`.
@@ -72,9 +57,11 @@ function _matchesBitcoinNetwork (result, expected) {
  * Bitcoin and Spark addresses encode their network, so for bip122 and spark
  * chain ids the reference selects the expected network and a mismatching
  * address fails with NETWORK_MISMATCH — as does a missing or unknown
- * reference, since the expected network cannot be confirmed. Legacy
- * testnet-format addresses accepted for the regtest chain id are reported
- * with the network normalized to "regtest".
+ * reference, since the expected network cannot be confirmed. An address
+ * matches when the expected network is among its compatible networks
+ * (some formats are shared: legacy testnet Bitcoin addresses are also
+ * valid on regtest, and Spark L1 deposit addresses for testnet/signet
+ * and regtest/local share their Bitcoin formats).
  *
  * @param {string} chainId - A CAIP-2 chain id (e.g. "eip155:1") or a bare chain namespace (e.g. "eip155").
  * @param {string} address - The address to validate.
@@ -92,16 +79,10 @@ export function validateAddress (chainId, address) {
   const result = validate(address)
   if (!result.success) return result
 
-  if (namespace === 'bip122') {
-    const expected = BITCOIN_NETWORKS[reference]
-    if (!_matchesBitcoinNetwork(result, expected)) {
-      return { success: false, reason: 'NETWORK_MISMATCH' }
-    }
-    if (result.network !== expected) {
-      return { ...result, network: expected }
-    }
+  if (namespace === 'bip122' && !result.compatibleNetworks.includes(BITCOIN_NETWORKS[reference])) {
+    return { success: false, reason: 'NETWORK_MISMATCH' }
   }
-  if (namespace === 'spark' && result.network !== reference) {
+  if (namespace === 'spark' && !result.compatibleNetworks.includes(reference)) {
     return { success: false, reason: 'NETWORK_MISMATCH' }
   }
   return result

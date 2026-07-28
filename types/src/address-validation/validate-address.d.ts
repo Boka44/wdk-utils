@@ -6,9 +6,11 @@
  * Bitcoin and Spark addresses encode their network, so for bip122 and spark
  * chain ids the reference selects the expected network and a mismatching
  * address fails with NETWORK_MISMATCH — as does a missing or unknown
- * reference, since the expected network cannot be confirmed. Legacy
- * testnet-format addresses accepted for the regtest chain id are reported
- * with the network normalized to "regtest".
+ * reference, since the expected network cannot be confirmed. An address
+ * matches when the expected network is among its compatible networks
+ * (some formats are shared: legacy testnet Bitcoin addresses are also
+ * valid on regtest, and Spark L1 deposit addresses for testnet/signet
+ * and regtest/local share their Bitcoin formats).
  *
  * @param {string} chainId - A CAIP-2 chain id (e.g. "eip155:1") or a bare chain namespace (e.g. "eip155").
  * @param {string} address - The address to validate.

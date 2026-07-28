@@ -24,15 +24,15 @@ describe('bitcoin', () => {
   }
 
   const successCases = [
-    { address: mainnet.p2pkh, expected: { success: true, type: 'p2pkh', network: 'bitcoin' } },
-    { address: mainnet.p2sh, expected: { success: true, type: 'p2sh', network: 'bitcoin' } },
-    { address: mainnet.bech32, expected: { success: true, type: 'bech32', network: 'bitcoin' } },
-    { address: mainnet.bech32m, expected: { success: true, type: 'bech32m', network: 'bitcoin' } },
-    { address: testnet.p2pkh, expected: { success: true, type: 'p2pkh', network: 'testnet' } },
-    { address: testnet.p2sh, expected: { success: true, type: 'p2sh', network: 'testnet' } },
-    { address: testnet.bech32, expected: { success: true, type: 'bech32', network: 'testnet' } },
-    { address: testnet.bech32m, expected: { success: true, type: 'bech32m', network: 'testnet' } },
-    { address: testnet.regtest, expected: { success: true, type: 'bech32m', network: 'regtest' } }
+    { address: mainnet.p2pkh, expected: { success: true, type: 'p2pkh', compatibleNetworks: ['bitcoin'] } },
+    { address: mainnet.p2sh, expected: { success: true, type: 'p2sh', compatibleNetworks: ['bitcoin'] } },
+    { address: mainnet.bech32, expected: { success: true, type: 'bech32', compatibleNetworks: ['bitcoin'] } },
+    { address: mainnet.bech32m, expected: { success: true, type: 'bech32m', compatibleNetworks: ['bitcoin'] } },
+    { address: testnet.p2pkh, expected: { success: true, type: 'p2pkh', compatibleNetworks: ['testnet', 'regtest'] } },
+    { address: testnet.p2sh, expected: { success: true, type: 'p2sh', compatibleNetworks: ['testnet', 'regtest'] } },
+    { address: testnet.bech32, expected: { success: true, type: 'bech32', compatibleNetworks: ['testnet'] } },
+    { address: testnet.bech32m, expected: { success: true, type: 'bech32m', compatibleNetworks: ['testnet'] } },
+    { address: testnet.regtest, expected: { success: true, type: 'bech32m', compatibleNetworks: ['regtest'] } }
   ]
 
   // --- Test the main address validator ---

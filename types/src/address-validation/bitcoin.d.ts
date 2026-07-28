@@ -24,9 +24,10 @@ export function validateBech32m(address: string): BtcAddressValidationResult;
  */
 export function validateBitcoinAddress(address: string): BtcAddressValidationResult;
 export type BtcAddressValidationFailure = import("./types.js").AddressValidationFailure;
+export type BtcNetwork = "bitcoin" | "testnet" | "regtest";
 export type BtcAddressValidationSuccess = {
     success: true;
     type: "p2pkh" | "p2sh" | "bech32" | "bech32m";
-    network: "bitcoin" | "testnet" | "regtest";
+    compatibleNetworks: BtcNetwork[];
 };
 export type BtcAddressValidationResult = BtcAddressValidationSuccess | BtcAddressValidationFailure;

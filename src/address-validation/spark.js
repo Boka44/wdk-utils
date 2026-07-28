@@ -17,7 +17,8 @@ import { bech32m } from '@scure/base'
 import { validateBech32m } from './bitcoin.js'
 
 /** @typedef {import("./types.js").AddressValidationFailure} SparkAddressValidationFailure */
-/** @typedef {{ success: true, type: 'spark' | 'btc', network: 'mainnet' | 'testnet' | 'regtest' | 'signet' | 'local' }} SparkAddressValidationSuccess */
+/** @typedef {'mainnet' | 'testnet' | 'regtest' | 'signet' | 'local'} SparkNetwork */
+/** @typedef {{ success: true, type: 'spark' | 'btc', compatibleNetworks: SparkNetwork[] }} SparkAddressValidationSuccess */
 /** @typedef {SparkAddressValidationSuccess | SparkAddressValidationFailure} SparkAddressValidationResult */
 
 const PREFIX_NETWORKS = {
@@ -29,8 +30,22 @@ const PREFIX_NETWORKS = {
 }
 
 /**
+ * Bitcoin L1 network labels → the Spark networks whose L1 deposits use them.
+ * Per the Spark SDK's NetworkConfig, signet reuses the Bitcoin testnet
+ * address config ("tb" prefix) and local reuses regtest's ("bcrt" prefix),
+ * so those L1 addresses are compatible with both Spark networks:
+ * https://github.com/buildonspark/spark/blob/5d3d38486b711b11fc4e9ae13de628396f53d0e0/sdks/js/packages/spark-sdk/src/utils/network.ts#L42-L48
+ * @type {Record<string, SparkNetwork[]>}
+ */
+const L1_NETWORKS = {
+  bitcoin: ['mainnet'],
+  testnet: ['testnet', 'signet'],
+  regtest: ['regtest', 'local']
+}
+
+/**
  * Validates a Bitcoin L1 deposit address, mapping the Bitcoin network label
- * to the Spark network vocabulary.
+ * to the Spark networks it is compatible with.
  *
  * @param {string} address The address to validate.
  * @returns {SparkAddressValidationResult}
@@ -38,7 +53,8 @@ const PREFIX_NETWORKS = {
 function _validateL1Address (address) {
   const btc = validateBech32m(address)
   if (!btc.success) return { success: false, reason: 'INVALID_FORMAT' }
-  return { success: true, type: 'btc', network: btc.network === 'bitcoin' ? 'mainnet' : btc.network }
+  const [network] = btc.compatibleNetworks
+  return { success: true, type: 'btc', compatibleNetworks: L1_NETWORKS[network] }
 }
 
 /**
@@ -74,7 +90,7 @@ export function validateSparkAddress (address) {
 
   const network = PREFIX_NETWORKS[decoded.prefix]
   if (network) {
-    return { success: true, type: 'spark', network }
+    return { success: true, type: 'spark', compatibleNetworks: [network] }
   }
 
   return _validateL1Address(trimmed)

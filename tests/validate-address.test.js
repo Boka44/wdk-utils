@@ -18,7 +18,7 @@ describe('validateAddress', () => {
   it('dispatches bip122 chain ids to the Bitcoin validator', () => {
     const result = validateAddress('bip122:000000000019d6689c085ae165831e93', '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa')
 
-    expect(result).toEqual({ success: true, type: 'p2pkh', network: 'bitcoin' })
+    expect(result).toEqual({ success: true, type: 'p2pkh', compatibleNetworks: ['bitcoin'] })
   })
 
   it('dispatches eip155 chain ids to the EVM validator', () => {
@@ -36,7 +36,7 @@ describe('validateAddress', () => {
   it('dispatches spark chain ids to the Spark validator', () => {
     const result = validateAddress('spark:mainnet', 'spark1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8w6hqs2')
 
-    expect(result).toEqual({ success: true, type: 'spark', network: 'mainnet' })
+    expect(result).toEqual({ success: true, type: 'spark', compatibleNetworks: ['mainnet'] })
   })
 
   it('dispatches tron chain ids to the Tron validator', () => {
@@ -98,16 +98,16 @@ describe('validateAddress', () => {
     expect(validateAddress(1, '0x742d35Cc6634C0532925a3b844Bc454e4438f44e')).toEqual({ success: false, reason: 'INVALID_CHAIN_ID' })
   })
 
-  it('accepts a legacy testnet-format address for the Bitcoin regtest chain id and normalizes the network', () => {
+  it('accepts a legacy testnet-format address for the Bitcoin regtest chain id', () => {
     const result = validateAddress('bip122:0f9188f13cb7b2c71f2a335e3a4fc328', 'mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn')
 
-    expect(result).toEqual({ success: true, type: 'p2pkh', network: 'regtest' })
+    expect(result).toEqual({ success: true, type: 'p2pkh', compatibleNetworks: ['testnet', 'regtest'] })
   })
 
-  it('accepts a legacy testnet-format p2sh address for the Bitcoin regtest chain id and normalizes the network', () => {
+  it('accepts a legacy testnet-format p2sh address for the Bitcoin regtest chain id', () => {
     const result = validateAddress('bip122:0f9188f13cb7b2c71f2a335e3a4fc328', '2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc')
 
-    expect(result).toEqual({ success: true, type: 'p2sh', network: 'regtest' })
+    expect(result).toEqual({ success: true, type: 'p2sh', compatibleNetworks: ['testnet', 'regtest'] })
   })
 
   it('rejects a bech32 testnet address for the Bitcoin regtest chain id', () => {
@@ -119,7 +119,7 @@ describe('validateAddress', () => {
   it('accepts a Bitcoin L1 deposit address for the Spark mainnet chain id', () => {
     const result = validateAddress('spark:mainnet', 'bc1p4lpn5nrunrjdk6teyjd2z53vmv82hlgjvv4pejkhg9wz5jq86zuqsruz85')
 
-    expect(result).toEqual({ success: true, type: 'btc', network: 'mainnet' })
+    expect(result).toEqual({ success: true, type: 'btc', compatibleNetworks: ['mainnet'] })
   })
 
   it('rejects a Spark address from another network', () => {
@@ -137,6 +137,18 @@ describe('validateAddress', () => {
   it('accepts a Spark regtest address for the Spark regtest chain id', () => {
     const result = validateAddress('spark:regtest', 'sparkrt1pgss82uvuvyjggx72gl42qk3285yz0j6lgxw9uk2mvgajsr8w22nudv8uueuu4')
 
-    expect(result).toEqual({ success: true, type: 'spark', network: 'regtest' })
+    expect(result).toEqual({ success: true, type: 'spark', compatibleNetworks: ['regtest'] })
+  })
+
+  it('accepts a testnet L1 address for the Spark signet chain id', () => {
+    const result = validateAddress('spark:signet', 'tb1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vq47zagq')
+
+    expect(result).toEqual({ success: true, type: 'btc', compatibleNetworks: ['testnet', 'signet'] })
+  })
+
+  it('accepts a regtest L1 address for the Spark local chain id', () => {
+    const result = validateAddress('spark:local', 'bcrt1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqc8gma6')
+
+    expect(result).toEqual({ success: true, type: 'btc', compatibleNetworks: ['regtest', 'local'] })
   })
 })
