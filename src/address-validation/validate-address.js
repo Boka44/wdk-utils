@@ -19,15 +19,8 @@ import { validateSolanaAddress } from './solana.js'
 import { validateSparkAddress } from './spark.js'
 import { validateTronAddress } from './tron.js'
 
-/** @typedef {import("./types.js").AddressValidationFailure} AddressValidationFailure */
-/** @typedef {import("./bitcoin.js").BtcAddressValidationResult} BtcAddressValidationResult */
-/** @typedef {import("./evm.js").EvmAddressValidationResult} EvmAddressValidationResult */
-/** @typedef {import("./solana.js").SolanaAddressValidationResult} SolanaAddressValidationResult */
-/** @typedef {import("./spark.js").SparkAddressValidationResult} SparkAddressValidationResult */
-/** @typedef {import("./tron.js").TronAddressValidationResult} TronAddressValidationResult */
-
 /**
- * @typedef {BtcAddressValidationResult | EvmAddressValidationResult | SolanaAddressValidationResult | SparkAddressValidationResult | TronAddressValidationResult | AddressValidationFailure} ValidateAddressResult
+ * @typedef {import("./bitcoin.js").BtcAddressValidationResult | import("./evm.js").EvmAddressValidationResult | import("./solana.js").SolanaAddressValidationResult | import("./spark.js").SparkAddressValidationResult | import("./tron.js").TronAddressValidationResult | import("./types.js").AddressValidationFailure} ValidateAddressResult
  */
 
 /** Address validators by CAIP-2 chain namespace. */
