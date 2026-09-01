@@ -1,7 +1,7 @@
 /**
- * Validates a TON address in either the raw (`<workchain>:<hex>`) or
- * user-friendly (base64) form. User-friendly addresses are checked against
- * their CRC16-CCITT checksum; raw addresses carry no checksum, so only their
+ * Validates a TON address in either raw (`<workchain>:<hex>`) or user-friendly
+ * (base64/base64url) form. User-friendly addresses are verified against their
+ * CRC16-CCITT checksum; raw addresses carry no checksum, so only their
  * structure is validated.
  *
  * @param {string} address The address to validate.
@@ -12,6 +12,5 @@ export type TonAddressValidationFailure = import("./types.js").AddressValidation
 export type TonAddressValidationSuccess = {
     success: true;
     type: "ton";
-    form: "raw" | "user-friendly";
 };
 export type TonAddressValidationResult = TonAddressValidationSuccess | TonAddressValidationFailure;
